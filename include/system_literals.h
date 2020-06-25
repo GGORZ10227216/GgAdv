@@ -17,9 +17,10 @@ namespace MsgString {
 }
 
 namespace ModeString {
-   constexpr auto ModeName = Utility::MakeArray(
-       "User", "Fiq", "Irq", "Supervisor", "Abort", "Undefined", "System"
-   ) ;
+    enum { Str_Usr, Str_Fiq, Str_Irq, Str_Svc, Str_Abt, Str_Und, Str_Sys } ;
+    constexpr auto ModeName = Utility::MakeArray(
+        "User", "Fiq", "Irq", "Supervisor", "Abort", "Undefined", "System"
+    ) ;
 } ;
 
 #endif //CPU_SYSTEM_LITERALS_H

@@ -18,24 +18,42 @@
 namespace Components {
     class CPU : public Component_t {
     public :
-        CPU() : _regs(this) {}
+        CPU() : _regs(this) {
+            ChangeCPUMode(ModeEnum::USR) ;
+        } // CPU()
+
         std::string ToString() override {
             return _regs.ToString();
         } // ToString()
 
+        void ChangeCPUMode(CpuMode newMode) {
+            _regs._cpsr = (_regs._cpsr >> 5) << 5 ;
+            _regs._cpsr |= newMode ;
+        } // ChangeCPUMode()
+
     private :
         class Registers : private ChildComponent_t<CPU> {
         public :
+            friend CPU ;
             explicit Registers(CPU* parent) : ChildComponent_t(parent) {}
 
-            unsigned ReadReg(DecodeMode dMode, size_t regNum) ;
+            unsigned ReadReg(RegName regNum) ;
             unsigned ReadCpsr() ;
             unsigned ReadSpsr() ;
-            unsigned ProgramCounter() { return _registers_usersys[15]; }
+            CpuMode ReadCPUMode() ;
+            bool TestFlag( CPU_Enum::E_PSRBit bitName ) {
+                return Utility::TestBit( _cpsr, bitName ) ;
+            }
+
+            void WriteCpsr(unsigned newCpsr) ;
+            void WriteReg(CPU_Enum::E_RegName reg, unsigned val) ;
+
             std::string ToString() override ;
 
             template<size_t... Idx>
             std::string PrintGeneralReg( std::integer_sequence<size_t, Idx...> ) ;
+
+            std::string PrintStatus() ;
         private :
             std::array<unsigned, 16> _registers_usersys{};
             std::array<unsigned, 7> _registers_fiq{};
@@ -46,12 +64,11 @@ namespace Components {
 
             unsigned _cpsr ;
             unsigned _spsr_fiq, _spsr_svc, _spsr_abt, _spsr_irq, _spsr_und ;
-
-            bool IsVisible( DecodeMode dMode, size_t regNum ) ;
+            bool IsVisible( bool inThumb, size_t regNum ) ;
+            unsigned& GetRegRef(RegName reg) ;
         };
 
         Registers _regs ;
-        CpuMode _cpuMode ;
     };
 }
 #endif //CPU_CPU_H
