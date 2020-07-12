@@ -3,8 +3,11 @@
 //
 
 #include <string>
+#include <iostream>
+
 #include <system_enum.h>
 #include <system_literals.h>
+#include <fmt/ostream.h>
 
 #ifndef CPU_COMPONENT_TYPE_H
 #define CPU_COMPONENT_TYPE_H
@@ -21,10 +24,8 @@ struct Component_t {
     } // ErrorHandler()
 };
 
-template<typename T>
-struct ChildComponent_t : public Component_t {
-    ChildComponent_t(Component_t* parent) : _parent(*static_cast<T*>(parent)) {}
-    T& _parent ;
+struct ClkDrivenComponent_t : public Component_t {
+    virtual void Tick() = 0 ;
 };
 
 #endif //CPU_COMPONENT_TYPE_H

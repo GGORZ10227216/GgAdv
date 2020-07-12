@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerExplorerSettingsProvider">
+    <option name="enabled" value="false" />
+    <option name="connected" value="true" />
+    <option name="remoteCompilers">
+      <list>
+        <RemoteCompilerInfo>
+          <option name="id" value="/usr/bin/gcc" />
+          <option name="name" value="/usr/bin/gcc" />
+          <option name="language" value="c" />
+          <option name="version" value="gcc (Ubuntu 8.4.0-1ubuntu1~18.04) 8.4.0" />
+          <option name="executable" value="/usr/bin/gcc" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="/usr/bin/gcc-6" />
+          <option name="name" value="/usr/bin/gcc-6" />
+          <option name="language" value="c" />
+          <option name="version" value="gcc-6 (Ubuntu 6.5.0-2ubuntu1~18.04) 6.5.0 20181026" />
+          <option name="executable" value="/usr/bin/gcc-6" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="/usr/bin/gcc-7" />
+          <option name="name" value="/usr/bin/gcc-7" />
+          <option name="language" value="c" />
+          <option name="version" value="gcc-7 (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0" />
+          <option name="executable" value="/usr/bin/gcc-7" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="defaultgnuas" />
+          <option name="name" value="GNU AS (default)" />
+          <option name="language" value="assembly" />
+          <option name="version" value="GNU assembler (GNU Binutils for Ubuntu) 2.30" />
+          <option name="executable" value="/usr/bin/as" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="python35" />
+          <option name="name" value="Python 3.5" />
+          <option name="language" value="python" />
+          <option name="executable" value="python3.5" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="python36" />
+          <option name="name" value="Python 3.6" />
+          <option name="language" value="python" />
+          <option name="executable" value="python3.6" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="python37" />
+          <option name="name" value="Python 3.7" />
+          <option name="language" value="python" />
+          <option name="executable" value="python3.7" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="python38" />
+          <option name="name" value="Python 3.8" />
+          <option name="language" value="python" />
+          <option name="executable" value="python3.8" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="g10" />
+          <option name="name" value="g++ 10.x" />
+          <option name="language" value="c++" />
+          <option name="version" value="g++-10 (Ubuntu 10.1.0-2ubuntu1~18.04) 10.1.0" />
+          <option name="executable" value="/usr/bin/g++-10" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="g6" />
+          <option name="name" value="g++ 6.x" />
+          <option name="language" value="c++" />
+          <option name="version" value="g++-6 (Ubuntu 6.5.0-2ubuntu1~18.04) 6.5.0 20181026" />
+          <option name="executable" value="/usr/bin/g++-6" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="g7" />
+          <option name="name" value="g++ 7.x" />
+          <option name="language" value="c++" />
+          <option name="version" value="g++-7 (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0" />
+          <option name="executable" value="/usr/bin/g++-7" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="g8" />
+          <option name="name" value="g++ 8.x" />
+          <option name="language" value="c++" />
+          <option name="version" value="g++-8 (Ubuntu 8.4.0-1ubuntu1~18.04) 8.4.0" />
+          <option name="executable" value="/usr/bin/g++-8" />
+        </RemoteCompilerInfo>
+        <RemoteCompilerInfo>
+          <option name="id" value="gdefault" />
+          <option name="name" value="g++ default" />
+          <option name="language" value="c++" />
+          <option name="version" value="g++ (Ubuntu 8.4.0-1ubuntu1~18.04) 8.4.0" />
+          <option name="executable" value="/usr/bin/g++" />
+        </RemoteCompilerInfo>
+      </list>
+    </option>
+    <option name="localCompilerSettings">
+      <map>
+        <entry>
+          <key>
+            <LocalCompilerPath>
+              <option name="path" value="/usr/bin/g++-10" />
+            </LocalCompilerPath>
+          </key>
+          <value>
+            <LocalCompilerSettings>
+              <option name="name" value="GCC" />
+              <option name="version" value="10.1.0" />
+              <option name="target" value="x86_64" />
+            </LocalCompilerSettings>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="compilerMatches">
+      <map>
+        <entry>
+          <key>
+            <LocalCompilerPath>
+              <option name="path" value="/usr/bin/g++-10" />
+            </LocalCompilerPath>
+          </key>
+          <value>
+            <CompilerMatches>
+              <option name="chosenMatch">
+                <CompilerMatch>
+                  <option name="remoteCompilerInfo">
+                    <RemoteCompilerInfo>
+                      <option name="id" value="g10" />
+                      <option name="name" value="g++ 10.x" />
+                      <option name="language" value="c++" />
+                      <option name="version" value="g++-10 (Ubuntu 10.1.0-2ubuntu1~18.04) 10.1.0" />
+                      <option name="executable" value="/usr/bin/g++-10" />
+                    </RemoteCompilerInfo>
+                  </option>
+                  <option name="compilerMatchKind" value="EXACT_MATCH" />
+                </CompilerMatch>
+              </option>
+              <option name="otherMatches">
+                <list>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="id" value="g10" />
+                        <option name="name" value="g++ 10.x" />
+                        <option name="language" value="c++" />
+                        <option name="version" value="g++-10 (Ubuntu 10.1.0-2ubuntu1~18.04) 10.1.0" />
+                        <option name="executable" value="/usr/bin/g++-10" />
+                      </RemoteCompilerInfo>
+                    </option>
+                    <option name="compilerMatchKind" value="EXACT_MATCH" />
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="id" value="g6" />
+                        <option name="name" value="g++ 6.x" />
+                        <option name="language" value="c++" />
+                        <option name="version" value="g++-6 (Ubuntu 6.5.0-2ubuntu1~18.04) 6.5.0 20181026" />
+                        <option name="executable" value="/usr/bin/g++-6" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="id" value="g7" />
+                        <option name="name" value="g++ 7.x" />
+                        <option name="language" value="c++" />
+                        <option name="version" value="g++-7 (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0" />
+                        <option name="executable" value="/usr/bin/g++-7" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="id" value="g8" />
+                        <option name="name" value="g++ 8.x" />
+                        <option name="language" value="c++" />
+                        <option name="version" value="g++-8 (Ubuntu 8.4.0-1ubuntu1~18.04) 8.4.0" />
+                        <option name="executable" value="/usr/bin/g++-8" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                  <CompilerMatch>
+                    <option name="remoteCompilerInfo">
+                      <RemoteCompilerInfo>
+                        <option name="id" value="gdefault" />
+                        <option name="name" value="g++ default" />
+                        <option name="language" value="c++" />
+                        <option name="version" value="g++ (Ubuntu 8.4.0-1ubuntu1~18.04) 8.4.0" />
+                        <option name="executable" value="/usr/bin/g++" />
+                      </RemoteCompilerInfo>
+                    </option>
+                  </CompilerMatch>
+                </list>
+              </option>
+            </CompilerMatches>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="additionalSwitches" value="-fverbose-asm -O3 " />
+    <option name="initialNoticeShown" value="true" />
+  </component>
+</project>

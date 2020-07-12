@@ -2,70 +2,153 @@
 // Created by orzgg on 2020-06-25.
 //
 
-#include <cpu.h>
+#include <register.h>
 #include <utility>
 #include <exception>
 
 using namespace ModeEnum;
 using namespace ErrorEnum;
-using namespace CPU_Enum ;
-using namespace ModeString ;
+using namespace CPU_Enum;
+using namespace CPUString;
 
-std::string Components::CPU::Registers::ToString() {
-    std::string Status = PrintStatus();
-    std::string GeneralRegister = PrintGeneralReg( std::make_index_sequence<8>{} ) ;
-    std::string ModeSpecificRegister ;
+std::string Components::Registers::ToString() {
+    if (!Utility::TestBit(_cpsr, T)) {
+        switch (_cpsr & cpuModeMask) {
+            case USR : case SYS :
+                return fmt::format(
+                        CPUString::UserSysRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[8], _registers_usersys[9], _registers_usersys[10],
+                        _registers_usersys[11],
+                        _registers_usersys[12], _registers_usersys[13], _registers_usersys[14],
+                        _registers_usersys[15]
+                );
+            case FIQ :
+                return fmt::format(
+                        CPUString::FIQRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_fiq[0], _registers_fiq[1], _registers_fiq[2], _registers_fiq[3],
+                        _registers_fiq[4], _registers_fiq[5], _registers_fiq[6], _registers_usersys[15]
+                );
+            case IRQ :
+                return fmt::format(
+                        CPUString::IRQRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[8], _registers_usersys[9], _registers_usersys[10],
+                        _registers_usersys[11],
+                        _registers_usersys[12], _registers_irq[0], _registers_irq[1],
+                        _registers_usersys[15]
+                );
+            case SVC :
+                return fmt::format(
+                        CPUString::SVCRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[8], _registers_usersys[9], _registers_usersys[10],
+                        _registers_usersys[11],
+                        _registers_usersys[12], _registers_svc[0], _registers_svc[1],
+                        _registers_usersys[15]
+                );
+            case ABT :
+                return fmt::format(
+                        CPUString::ABTRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[8], _registers_usersys[9], _registers_usersys[10],
+                        _registers_usersys[11],
+                        _registers_usersys[12], _registers_abt[0], _registers_abt[1],
+                        _registers_usersys[15]
+                );
+            case UND :
+                return fmt::format(
+                        CPUString::UNDRegFormat_Arm,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[8], _registers_usersys[9], _registers_usersys[10],
+                        _registers_usersys[11],
+                        _registers_usersys[12], _registers_und[0], _registers_und[1],
+                        _registers_usersys[15]
+                );
+            default :
+                throw std::logic_error("Unknown CPU Mode!");
+        } // switch
+    } // if
+    else {
+        switch (_cpsr & cpuModeMask) {
+            case USR : case SYS :
+                return fmt::format(
+                        CPUString::UserSysRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_usersys[13], _registers_usersys[14],
+                        _registers_usersys[15]
+                );
+            case FIQ :
+                return fmt::format(
+                        CPUString::FIQRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                         _registers_fiq[0], _registers_fiq[1], _registers_usersys[15]
+                );
+            case IRQ :
+                return fmt::format(
+                        CPUString::IRQRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_irq[0], _registers_irq[1], _registers_usersys[15]
+                );
+            case SVC :
+                return fmt::format(
+                        CPUString::SVCRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_svc[0], _registers_svc[1], _registers_usersys[15]
+                );
+            case ABT :
+                return fmt::format(
+                        CPUString::ABTRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_abt[0], _registers_abt[1], _registers_usersys[15]
+                );
+            case UND :
+                return fmt::format(
+                        CPUString::UNDRegFormat_Thumb,
+                        _registers_usersys[0], _registers_usersys[1], _registers_usersys[2],
+                        _registers_usersys[3],
+                        _registers_usersys[4], _registers_usersys[5], _registers_usersys[6],
+                        _registers_usersys[7],
+                        _registers_und[0], _registers_und[1], _registers_usersys[15]
+                );
+            default :
+                throw std::logic_error("Unknown CPU Mode!");
+        } // switch
+    } // else
 
-    return fmt::format( "{}\n{}\n{}\n", Status, GeneralRegister, ModeSpecificRegister ) ;
-}
-
-std::string Components::CPU::Registers::PrintStatus() {
-    std::string decodeMode = TestFlag( T ) ? "Thumb" : "Arm" ;
-    std::string cpuMode ;
-    char flagV = TestFlag( V ) ? 'V' : 'v' ;
-    char flagC = TestFlag( C ) ? 'C' : 'c' ;
-    char flagZ = TestFlag( Z ) ? 'Z' : 'z' ;
-    char flagN = TestFlag( N ) ? 'N' : 'n' ;
-    char flagI = TestFlag( I ) ? 'I' : 'i' ;
-    char flagF = TestFlag( F ) ? 'F' : 'f' ;
-
-    switch (_cpsr & cpuModeMask) {
-        case FIQ :
-            cpuMode = ModeString::ModeName[ Str_Fiq ] ;
-            break ;
-        case IRQ :
-            cpuMode = ModeString::ModeName[ Str_Irq ] ;
-            break ;
-        case SVC :
-            cpuMode = ModeString::ModeName[ Str_Svc ] ;
-            break ;
-        case ABT :
-            cpuMode = ModeString::ModeName[ Str_Abt ] ;
-            break ;
-        case UND :
-            cpuMode = ModeString::ModeName[ Str_Und ] ;
-            break ;
-        case USR :
-            cpuMode = ModeString::ModeName[ Str_Usr ] ;
-            break ;
-        case SYS :
-            cpuMode = ModeString::ModeName[ Str_Sys ] ;
-            break ;
-        default :
-            throw std::logic_error( "Unknown CPU Mode!" ) ;
-    } // switch
-
-    return fmt::format( "Mode: <{},{}>, flags:[{} {} {} {} : {} {}]",
-        decodeMode, cpuMode, flagN, flagZ, flagC, flagV, flagI, flagF
-    ) ;
-}
-
-template<size_t... Idx>
-std::string Components::CPU::Registers::PrintGeneralReg(std::integer_sequence<size_t, Idx...> ) {
-    return fmt::format(
-            "General register (r0~r7) :\n"
-            "\tr0: {:#010x}, r1: {:#010x}, r2: {:#010x}, r3: {:#010x}\n"
-            "\tr4: {:#010x}, r5: {:#010x}, r6: {:#010x}, r7: {:#010x}\n",
-            _registers_usersys[ Idx ]...
-    ) ;
+    return "" ;
 }

@@ -1,10 +1,11 @@
+#include <optional>
 #include <iostream>
 #include <system_components.h>
 
 Components::System Components::emulator ;
 
-int main() {
+int main( ) {
     using namespace Components ;
-    std::cout << emulator.cpu.ToString() << std::endl;
+    Components::emulator.Start(std::nullopt) ;
     return 0;
 }
