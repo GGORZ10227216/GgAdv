@@ -3,6 +3,7 @@
 //
 
 #include <unordered_map>
+#include <memory>
 
 #include <component_type.h>
 #include <system_enum.h>
@@ -23,8 +24,8 @@ namespace Components {
         Read, Write
     };
 
-    struct Memory final : public ClkDrivenComponent_t, public MMU::RegionBase {
-        Memory() ;
+    struct Memory final : public ClkDrivenComponent_t<Components::System>, public MMU::RegionBase {
+        Memory(Components::System* parentPtr) ;
 
         std::string ToString() override {
             // TODO: list all handler infomation

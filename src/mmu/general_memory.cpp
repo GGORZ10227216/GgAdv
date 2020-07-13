@@ -3,7 +3,6 @@
 //
 
 #include <general_memory.h>
-#include <system_components.h>
 
 using namespace MMU_Enum ;
 

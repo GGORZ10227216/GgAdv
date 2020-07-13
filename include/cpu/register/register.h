@@ -11,10 +11,10 @@
 #define TEST_REGISTER_H
 
 namespace Components {
-    class Registers : public Component_t {
+    class Registers {
     public :
         friend class CPU ;
-        std::string ToString() override ;
+        std::string ToString() ;
 
     private :
         std::array<unsigned, 16> _registers_usersys{};

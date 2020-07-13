@@ -5,7 +5,25 @@
 #include <exception>
 
 #include <system_components.h>
+#include <cpu.h>
+#include <mmu.h>
+#include <cycle_tools.h>
+#include <disassembler.h>
+
 #include <fmt/ostream.h>
+
+Components::System::System() :
+        cycleCounter(new CycleCounter(this)),
+        cpu(new CPU(this)),
+        memory(new Memory(this)),
+        disassembler(new Disassembler(this)) {}
+
+Components::System::~System() {
+    delete cycleCounter ;
+    delete cpu ;
+    delete memory ;
+    delete disassembler ;
+}
 
 void Components::System::Start(std::optional<const char*> romPath) {
     try {
@@ -28,14 +46,15 @@ void Components::System::LoadRom( std::fstream& romStream ) {
 }
 
 void Components::System::EmulationLoop() {
-    EMU_CPU.FillPipeline() ;
-    EMU_CYCLE = 0 ;
+    cpu->FillPipeline() ;
+    /// TODO: fix
+    cycles = 0 ;
     while (true) {
         /// TODO: using "true" before GUI is finished.
-        EMU_CPU.Tick() ;
-        fmt::print( "{}", EMU_CPU.ToString() ) ;
+        cpu->Tick() ;
+        fmt::print( "{}", cpu->ToString() ) ;
         /// TODO: manually set clk to 0 for cpu debugging
-        EMU_CYCLE = 0 ;
+        cycles = 0 ;
         getchar() ;
     } // while
 }

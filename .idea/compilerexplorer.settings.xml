@@ -201,7 +201,7 @@
         </entry>
       </map>
     </option>
-    <option name="additionalSwitches" value="-fverbose-asm -O3 " />
+    <option name="additionalSwitches" value="" />
     <option name="initialNoticeShown" value="true" />
   </component>
 </project>

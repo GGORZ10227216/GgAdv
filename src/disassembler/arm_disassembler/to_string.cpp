@@ -2,7 +2,6 @@
 // Created by orzgg on 2020-05-23.
 //
 
-#include <system_components.h>
 #include <system_enum.h>
 #include <cpu_decode.h>
 #include <disassemble/decoder/arm/arm_handler.h>
@@ -377,9 +376,10 @@ std::string disassemble::B_ToString(const ArmInstruction& self) {
         realAddr |= 0xfc000000 ;
 
     realAddr += 8 ;
-    ss << "b" << ( Get( info::L ) ? "l" : "" )
-       << cpu_decode::condition_name[ Get( info::condition ) ] << " #"
-       << cpu_decode::HexStr( realAddr + EMU_CPU.ReadReg( RegName::pc ) ) ;
+    /// TODO: fix
+//    ss << "b" << ( Get( info::L ) ? "l" : "" )
+//       << cpu_decode::condition_name[ Get( info::condition ) ] << " #"
+//       << cpu_decode::HexStr( realAddr + EMU_CPU.ReadReg( RegName::pc ) ) ;
 
     return ss.str() ;
 }

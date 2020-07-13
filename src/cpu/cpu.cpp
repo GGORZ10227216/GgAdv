@@ -2,11 +2,11 @@
 // Created by orzgg on 2020-06-25.
 //
 #include <cpu.h>
-#include <system_components.h>
 #include <arm_decoder.h>
 #include <arm_info.h>
 #include <arm_table.h>
 #include <thumb_decoder.h>
+#include <cycle_tools.h>
 #include <bit_manipulate.h>
 
 #include <utility>
@@ -16,10 +16,11 @@ using namespace ModeEnum;
 using namespace ErrorEnum;
 using namespace CPU_Enum;
 
-Components::CPU::CPU() {
+Components::CPU::CPU(Components::System* parentPtr) :
+    ClkDrivenComponent_t(parentPtr)
+{
     WriteCpsr(0xd3);
     WriteReg(r0, 0x00000ca5);
-    WriteReg(r1, 0x0);
     WriteReg(sp, 0x03007f00);
     WriteReg(pc, 0x0);
 }
@@ -27,13 +28,17 @@ Components::CPU::CPU() {
 void Components::CPU::FillPipeline() {
     unsigned pcOffset = CurrentDecodeMode() == DecodeMode::ARM ? 4 : 2;
     unsigned pcBase = 0 ;
-    EMU_CYCLE += cycleTools.S(ProgramCounter()) + cycleTools.N(ProgramCounter()) ;
+
+    const unsigned Sclk = emuInstance->cycleCounter->S(ProgramCounter()) ;
+    const unsigned Nclk = emuInstance->cycleCounter->N(ProgramCounter()) ;
+
+    emuInstance->cycles += Sclk + Nclk ;
     for (int i = 0 ; i < fetchedBuffer.size(); ++i) {
         pcBase = _regs._registers_usersys[pc] + pcOffset*i ;
         if (pcOffset == 4)
-            fetchedBuffer[i] = EMU_MEM.Read32(pcBase);
+            fetchedBuffer[i] = emuInstance->memory->Read32(pcBase);
         else
-            fetchedBuffer[i] = EMU_MEM.Read16(pcBase);
+            fetchedBuffer[i] = emuInstance->memory->Read16(pcBase);
     } // for
 
     _regs._registers_usersys[ pc ] = pcBase ;
@@ -45,14 +50,14 @@ void Components::CPU::Fetch() {
     unsigned pcOffset = CurrentDecodeMode() == DecodeMode::ARM ? 4 : 2;
     _regs._registers_usersys[pc] += pcOffset;
     if (pcOffset == 4)
-        fetchedBuffer[ stageCounter ] = EMU_MEM.Read32(ProgramCounter());
+        fetchedBuffer[ stageCounter ] = emuInstance->memory->Read32(ProgramCounter());
     else
-        fetchedBuffer[ stageCounter ] = EMU_MEM.Read16(ProgramCounter());
+        fetchedBuffer[ stageCounter ] = emuInstance->memory->Read16(ProgramCounter());
     stageCounter = (stageCounter + 1) % fetchedBuffer.size();
 }
 
 void Components::CPU::Tick() {
-    if (EMU_CYCLE == 0) {
+    if (emuInstance->cycles == 0) {
         // CPU is ready to process next instruction
         if ( !pipelineFlushed )
             Fetch();
@@ -75,7 +80,7 @@ void Components::CPU::Execute() {
 
 void Components::CPU::ExecuteArm() {
     if (ConditionCheck(Instruction() >> 28))
-        ArmHandlerTable[ arm_decoder::hash(Instruction()) ](*this) ;
+        ArmHandlerTable[ arm_decoder::hash(Instruction()) ](emuInstance) ;
 }
 
 void Components::CPU::ExecuteThumb() {

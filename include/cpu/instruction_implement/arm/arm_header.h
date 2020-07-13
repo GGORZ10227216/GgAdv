@@ -2,163 +2,163 @@
 // Created by orzgg on 2020-07-10.
 //
 
-#include <cpu.h>
+#include <system_components.h>
 
 #ifndef TEST_ARM_HEADER_H
 #define TEST_ARM_HEADER_H
 
 namespace ArmHandler {
-    void AND(Components::CPU &cpu);
+    void AND(Components::System* system);
 
-    void MUL(Components::CPU &cpu);
+    void MUL(Components::System* system);
 
-    void STRH(Components::CPU &cpu);
+    void STRH(Components::System* system);
 
-    void ANDS(Components::CPU &cpu);
+    void ANDS(Components::System* system);
 
-    void MULS(Components::CPU &cpu);
+    void MULS(Components::System* system);
 
-    void LDRH(Components::CPU &cpu);
+    void LDRH(Components::System* system);
 
-    void LDRSB(Components::CPU &cpu);
+    void LDRSB(Components::System* system);
 
-    void LDRSH(Components::CPU &cpu);
+    void LDRSH(Components::System* system);
 
-    void EOR(Components::CPU &cpu);
+    void EOR(Components::System* system);
 
-    void MLA(Components::CPU &cpu);
+    void MLA(Components::System* system);
 
-    void EORS(Components::CPU &cpu);
+    void EORS(Components::System* system);
 
-    void MLAS(Components::CPU &cpu);
+    void MLAS(Components::System* system);
 
-    void SUB(Components::CPU &cpu);
+    void SUB(Components::System* system);
 
-    void SUBS(Components::CPU &cpu);
+    void SUBS(Components::System* system);
 
-    void RSB(Components::CPU &cpu);
+    void RSB(Components::System* system);
 
-    void RSBS(Components::CPU &cpu);
+    void RSBS(Components::System* system);
 
-    void ADD(Components::CPU &cpu);
+    void ADD(Components::System* system);
 
-    void UMULL(Components::CPU &cpu);
+    void UMULL(Components::System* system);
 
-    void ADDS(Components::CPU &cpu);
+    void ADDS(Components::System* system);
 
-    void UMULLS(Components::CPU &cpu);
+    void UMULLS(Components::System* system);
 
-    void ADC(Components::CPU &cpu);
+    void ADC(Components::System* system);
 
-    void UMLAL(Components::CPU &cpu);
+    void UMLAL(Components::System* system);
 
-    void ADCS(Components::CPU &cpu);
+    void ADCS(Components::System* system);
 
-    void UMLALS(Components::CPU &cpu);
+    void UMLALS(Components::System* system);
 
-    void SBC(Components::CPU &cpu);
+    void SBC(Components::System* system);
 
-    void SMULL(Components::CPU &cpu);
+    void SMULL(Components::System* system);
 
-    void SBCS(Components::CPU &cpu);
+    void SBCS(Components::System* system);
 
-    void SMULLS(Components::CPU &cpu);
+    void SMULLS(Components::System* system);
 
-    void RSC(Components::CPU &cpu);
+    void RSC(Components::System* system);
 
-    void SMLAL(Components::CPU &cpu);
+    void SMLAL(Components::System* system);
 
-    void RSCS(Components::CPU &cpu);
+    void RSCS(Components::System* system);
 
-    void SMLALS(Components::CPU &cpu);
+    void SMLALS(Components::System* system);
 
-    void MRS(Components::CPU &cpu);
+    void MRS(Components::System* system);
 
-    void SWP(Components::CPU &cpu);
+    void SWP(Components::System* system);
 
-    void TST(Components::CPU &cpu);
+    void TST(Components::System* system);
 
-    void MSR(Components::CPU &cpu);
+    void MSR(Components::System* system);
 
-    void BX(Components::CPU &cpu);
+    void BX(Components::System* system);
 
-    void TEQ(Components::CPU &cpu);
+    void TEQ(Components::System* system);
 
-    void SWPB(Components::CPU &cpu);
+    void SWPB(Components::System* system);
 
-    void CMP(Components::CPU &cpu);
+    void CMP(Components::System* system);
 
-    void CMN(Components::CPU &cpu);
+    void CMN(Components::System* system);
 
-    void ORR(Components::CPU &cpu);
+    void ORR(Components::System* system);
 
-    void ORRS(Components::CPU &cpu);
+    void ORRS(Components::System* system);
 
-    void MOV(Components::CPU &cpu);
+    void MOV(Components::System* system);
 
-    void MOVS(Components::CPU &cpu);
+    void MOVS(Components::System* system);
 
-    void BIC(Components::CPU &cpu);
+    void BIC(Components::System* system);
 
-    void BICS(Components::CPU &cpu);
+    void BICS(Components::System* system);
 
-    void MVN(Components::CPU &cpu);
+    void MVN(Components::System* system);
 
-    void MVNS(Components::CPU &cpu);
+    void MVNS(Components::System* system);
 
-    void STR(Components::CPU &cpu);
+    void STR(Components::System* system);
 
-    void LDR(Components::CPU &cpu);
+    void LDR(Components::System* system);
 
-    void STRT(Components::CPU &cpu);
+    void STRT(Components::System* system);
 
-    void LDRT(Components::CPU &cpu);
+    void LDRT(Components::System* system);
 
-    void STRB(Components::CPU &cpu);
+    void STRB(Components::System* system);
 
-    void LDRB(Components::CPU &cpu);
+    void LDRB(Components::System* system);
 
-    void STRBT(Components::CPU &cpu);
+    void STRBT(Components::System* system);
 
-    void LDRBT(Components::CPU &cpu);
+    void LDRBT(Components::System* system);
 
-    void STMDA(Components::CPU &cpu);
+    void STMDA(Components::System* system);
 
-    void LDMDA(Components::CPU &cpu);
+    void LDMDA(Components::System* system);
 
-    void STM(Components::CPU &cpu);
+    void STM(Components::System* system);
 
-    void LDM(Components::CPU &cpu);
+    void LDM(Components::System* system);
 
-    void STMDB(Components::CPU &cpu);
+    void STMDB(Components::System* system);
 
-    void LDMDB(Components::CPU &cpu);
+    void LDMDB(Components::System* system);
 
-    void STMIB(Components::CPU &cpu);
+    void STMIB(Components::System* system);
 
-    void LDMIB(Components::CPU &cpu);
+    void LDMIB(Components::System* system);
 
-    void B(Components::CPU &cpu);
+    void B(Components::System* system);
 
-    void BL(Components::CPU &cpu);
+    void BL(Components::System* system);
 
-    void STC(Components::CPU &cpu);
+    void STC(Components::System* system);
 
-    void LDC(Components::CPU &cpu);
+    void LDC(Components::System* system);
 
-    void STCL(Components::CPU &cpu);
+    void STCL(Components::System* system);
 
-    void LDCL(Components::CPU &cpu);
+    void LDCL(Components::System* system);
 
-    void CDP(Components::CPU &cpu);
+    void CDP(Components::System* system);
 
-    void MCR(Components::CPU &cpu);
+    void MCR(Components::System* system);
 
-    void MRC(Components::CPU &cpu);
+    void MRC(Components::System* system);
 
-    void SVC(Components::CPU &cpu);
+    void SVC(Components::System* system);
 
-    void UDF(Components::CPU &cpu);
+    void UDF(Components::System* system);
 }
 
 #endif //TEST_ARM_HEADER_H

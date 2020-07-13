@@ -1,11 +1,16 @@
 #include <optional>
 #include <iostream>
+#include <thread>
 #include <system_components.h>
 
-Components::System Components::emulator ;
-
 int main( ) {
-    using namespace Components ;
-    Components::emulator.Start(std::nullopt) ;
+    std::thread emuWorker(
+        []() {
+            auto emulator = std::make_shared<Components::System>() ;
+            emulator->Start(std::nullopt) ;
+        }
+    ) ;
+
+    emuWorker.join() ;
     return 0;
 }

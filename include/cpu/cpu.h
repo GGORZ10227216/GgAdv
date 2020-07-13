@@ -10,7 +10,6 @@
 
 #include <register.h>
 #include <system_enum.h>
-#include <cycle_tools.h>
 #include <component_type.h>
 #include <system_literals.h>
 
@@ -18,11 +17,9 @@
 #define CPU_CPU_H
 
 namespace Components {
-    class CPU : public ClkDrivenComponent_t {
+    class CPU : public ClkDrivenComponent_t<Components::System> {
     public :
-        Cycle::CycleTools cycleTools ;
-
-        CPU();
+        CPU(Components::System* parentPtr);
 
         std::string ToString() override;
 

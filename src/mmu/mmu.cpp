@@ -3,10 +3,12 @@
 //
 
 #include <mmu.h>
-
 #include <gba_bios.h>
 
-Components::Memory::Memory() : MMU::RegionBase("SystemMemory") {
+Components::Memory::Memory(Components::System* parentPtr) :
+    ClkDrivenComponent_t(parentPtr),
+    MMU::RegionBase("SystemMemory")
+{
     /// TODO: temporary cancel the BIOS load
 //    static_assert( std::tuple_size_v<decltype(generalMemory.BIOS)> == biosData.size(), "BIOS size mismatch." ) ;
 //    memcpy( generalMemory.BIOS.data(), biosData.data(), generalMemory.BIOS.size() ) ;

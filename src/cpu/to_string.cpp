@@ -5,8 +5,9 @@
 #include <utility>
 #include <exception>
 
-#include <cpu.h>
 #include <system_components.h>
+#include <disassembler.h>
+#include <cpu.h>
 
 using namespace ModeEnum;
 using namespace ErrorEnum;
@@ -16,11 +17,12 @@ using namespace CPUString ;
 std::string Components::CPU::ToString() {
     std::string Status = PrintStatus();
     std::string registerStatus = _regs.ToString() ;
-
     return fmt::format("clk:{} [{:#04x}] {}(0x{:08x})\n{}\n{}\n",
-            EMU_CYCLE,
-            R15(), PRINT_ASM(EMU_CPU.Instruction()), EMU_CPU.Instruction(),
-                       Status, registerStatus
+            emuInstance->cycles,
+            R15(),
+            emuInstance->disassembler->Disassemble(Instruction()),
+            Instruction(),
+            Status, registerStatus
     ) ;
 }
 
