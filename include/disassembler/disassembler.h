@@ -12,8 +12,7 @@
 namespace Components {
     class Disassembler : public Component_t<Components::System> {
     public :
-        Disassembler(Components::System* parentPtr) :
-            Component_t(parentPtr) {}
+        Disassembler(Components::System* parentPtr) ;
 
         std::string Disassemble(unsigned binary) ;
         std::string ToString() override {

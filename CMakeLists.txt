@@ -3,7 +3,7 @@ project(cpu)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -fsanitize=address,leak,undefined")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -pthread -Ofast -flto")
 
 set(core_sources
         src/system_components.cpp
@@ -49,7 +49,7 @@ set(decoder_sources
         src/disassembler/disassembler.cpp)
 
 add_executable(cpu main.cpp ${core_sources} ${core_headers} ${decoder_sources})
-target_link_libraries(cpu /usr/local/lib/libfmt.a)
+target_link_libraries(cpu /usr/local/lib/libfmt.a /usr/local/lib/libbenchmark.a /usr/local/lib/libbenchmark_main.a)
 target_include_directories(cpu PUBLIC ${core_headers})
 
 project(test)

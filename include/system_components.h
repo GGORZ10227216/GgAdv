@@ -5,29 +5,38 @@
 #include <fstream>
 #include <memory>
 
+#include <cycle_tools.h>
+#include <cpu.h>
+#include <mmu.h>
+#include <disassembler.h>
+#include <optional>
+
 #ifndef CPU_SYSTEM_COMPONENETS_H
 #define CPU_SYSTEM_COMPONENETS_H
 
 namespace Components {
-    struct CycleCounter;
-    struct CPU;
-    struct Memory;
-    struct Disassembler;
-
-    struct System final {
+    struct System {
         unsigned cycles = 0;
-        System() ;
-        ~System() ;
+        System() :
+            cycleCounter(this),
+            cpu(this),
+            memory(this),
+            disassembler(this)
+        {
 
-        CycleCounter *cycleCounter = nullptr ;
-        CPU *cpu = nullptr ;
-        Memory *memory = nullptr ;
-        Disassembler *disassembler = nullptr ;
+        }
+
+        CycleCounter cycleCounter;
+        CPU cpu;
+        Memory memory;
+        Disassembler disassembler;
 
         void Start(std::optional<const char *> romPath);
+        void BenchmarkStart(std::optional<const char *> romPath) ;
     private :
         void LoadRom(std::fstream &romStream);
         void EmulationLoop();
+        void Benchmark() ;
     };
 }
 

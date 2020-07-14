@@ -18,12 +18,12 @@ namespace ArmHandler {
     using AccessLambda = std::function<unsigned(unsigned)> ;
 
     template<typename T>
-    unsigned Operand2_reg(Components::System* system, AccessLambda Get, bool& carry) {
-        unsigned shAmount = Get(T::RsMark) ? system->cpu->ReadReg(static_cast<RegName>(Get(T::Rs))) : Get(T::shAmount);
-        unsigned RmValue = system->cpu->ReadReg(static_cast<RegName>(Get(T::Rm)));
+    unsigned Operand2_reg(Components::System &emuInstance, AccessLambda Get, bool& carry) {
+        unsigned shAmount = Get(T::RsMark) ? EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rs))) : Get(T::shAmount);
+        unsigned RmValue = EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rm)));
 
         if ( Get(T::RsMark) )
-            system->cycles += system->cycleCounter->I() ;
+            EMU_CLK += CLK_CONT.I() ;
 
         switch (Get(T::shType)) {
             case ShiftType::LSL :
@@ -55,7 +55,7 @@ namespace ArmHandler {
                 return static_cast<int32_t> (RmValue) >> shAmount;
             case ShiftType::ROR :
                 if (shAmount == 0) {
-                    unsigned rrxVal = system->cpu->TestPSRFlag(PSRBit::C) ? Utility::_BV(31) : 0;
+                    unsigned rrxVal = EMU_CPU.TestPSRFlag(PSRBit::C) ? Utility::_BV(31) : 0;
                     return Utility::rotr(RmValue, 1) | rrxVal;
                 } // if
                 else if (shAmount > 32)
@@ -68,23 +68,23 @@ namespace ArmHandler {
     }
 
     template<typename T>
-    unsigned Operand2(Components::System* system, AccessLambda Get, bool& carry) {
+    unsigned Operand2(Components::System &emuInstance, AccessLambda Get, bool& carry) {
         if (!Get(T::I))
-            return Operand2_reg<T>(system, Get, carry);
+            return Operand2_reg<T>(emuInstance, Get, carry);
         else {
             return Utility::rotr(Get(T::imm), Get(T::rotate) * 2);
         } // else
     }
 
-    static void CPSR_Logical(Components::CPU* cpu, unsigned result, const bool carry) {
+    static void CPSR_Logical(Components::CPU &cpu, unsigned result, const bool carry) {
         using namespace CPU_Enum ;
-        Utility::TestBit(result, 31) ? cpu->SetFlag(N) : cpu->ClearFlag(N);
-        carry ? cpu->SetFlag(C) : cpu->ClearFlag(C);
-        result == 0 ? cpu->SetFlag(Z) : cpu->ClearFlag(Z);
+        Utility::TestBit(result, 31) ? cpu.SetFlag(N) : cpu.ClearFlag(N);
+        carry ? cpu.SetFlag(C) : cpu.ClearFlag(C);
+        result == 0 ? cpu.SetFlag(Z) : cpu.ClearFlag(Z);
     }
 
     template <typename T>
-    static void CPSR_Arithmetic(Components::CPU* cpu, unsigned Rn, unsigned op2, T result)
+    static void CPSR_Arithmetic(Components::CPU &cpu, unsigned Rn, unsigned op2, T result)
     requires std::is_same_v<T, uint64_t>
     {
         using namespace CPU_Enum ;
@@ -92,10 +92,10 @@ namespace ArmHandler {
         const bool op2Signed = Utility::TestBit( op2, 31 ) ;
         const bool resultSigned = Utility::TestBit( result, 31 ) ;
 
-        (RnSigned == op2Signed) && (RnSigned != resultSigned) ? cpu->SetFlag(V) : cpu->ClearFlag(V) ;
-        result > 0xffffffff ? cpu->SetFlag(C) : cpu->ClearFlag(C) ;
-        result == 0 ? cpu->SetFlag(Z) : cpu->ClearFlag(Z);
-        Utility::TestBit(result, 31) ? cpu->SetFlag(N) : cpu->ClearFlag(N) ;
+        (RnSigned == op2Signed) && (RnSigned != resultSigned) ? cpu.SetFlag(V) : cpu.ClearFlag(V) ;
+        result > 0xffffffff ? cpu.SetFlag(C) : cpu.ClearFlag(C) ;
+        result == 0 ? cpu.SetFlag(Z) : cpu.ClearFlag(Z);
+        Utility::TestBit(result, 31) ? cpu.SetFlag(N) : cpu.ClearFlag(N) ;
     }
 
     enum class ALUType { ARITHMETIC, LOGICAL } ;
@@ -105,32 +105,32 @@ namespace ArmHandler {
     template<ALUType T, CPSRaffect S, HasResult R>
     struct ALUProcessor {
         template<typename F>
-        ALUProcessor(Components::System* system, F operation) requires
+        ALUProcessor(Components::System &emuInstance, F operation) requires
             std::is_same_v<std::invoke_result_t<F, unsigned, unsigned>, uint64_t>
         {
-            system->cycles += system->cycleCounter->S(system->cpu->ReadReg(RegName::pc)) ;
+            EMU_CLK += CLK_CONT.S(EMU_CPU.ReadReg(RegName::pc)) ;
 
             using Type = disassemble::instruction_info<DecodeMode::ARM, 0>;
             auto Get = [&](unsigned idx) {
-                return Type::access[idx](system->cpu->Instruction()) ;
+                return Type::access[idx](EMU_CPU.Instruction()) ;
             } ;
 
             dstName = static_cast<RegName>( Get(Type::Rd) );
             Rn = Get(Type::Rn) ;
-            op2 = Operand2<Type>(system, Get, shiftCarry) ;
+            op2 = Operand2<Type>(emuInstance, Get, shiftCarry) ;
             result = operation(Rn, op2) ;
 
             if constexpr (S == CPSRaffect::S) {
                 if constexpr (T == ALUType::ARITHMETIC)
-                    CPSR_Arithmetic(system->cpu, Rn, op2, result ) ;
+                    CPSR_Arithmetic(EMU_CPU, Rn, op2, result ) ;
                 else
-                    CPSR_Logical(system->cpu, result, shiftCarry) ;
+                    CPSR_Logical(EMU_CPU, result, shiftCarry) ;
             } // if constexpr
 
             if constexpr (R == HasResult::NORMAL) {
-                system->cpu->WriteReg(dstName, result) ;
+                EMU_CPU.WriteReg(dstName, result) ;
                 if (Get(Type::Rd) == RegName::pc)
-                    system->cpu->FillPipeline() ;
+                    EMU_CPU.FillPipeline() ;
             } // if constexpr
         }
 

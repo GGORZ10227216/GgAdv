@@ -21,12 +21,12 @@ uint8_t &MMU::Region<Region_t::GamePak>::Access(unsigned addr, WIDTH width) {
     } // else if
 
     OutOfBound(addr);
-    return state1.at( state1.size() ) ;
 } // Access()
 
 void MMU::Region<Region_t::GamePak>::Reset() {
-    state1.fill( 0 ) ;
-    state2.fill( 0 ) ;
-    state3.fill( 0 ) ;
+    // TODO: heap array fill
+//    state1.fill( 0 ) ;
+//    state2.fill( 0 ) ;
+//    state3.fill( 0 ) ;
     SRAM.fill( 0 ) ;
 } // Reset()

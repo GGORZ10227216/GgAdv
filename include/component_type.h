@@ -19,7 +19,7 @@ namespace Components {
     template<typename T>
     struct Component_t {
         Component_t(T* parentPtr) :
-            emuInstance(parentPtr) {}
+            emuInstance(*parentPtr) {}
 
         virtual std::string ToString() = 0 ;
         virtual void ErrorHandler(ErrType type){
@@ -32,7 +32,7 @@ namespace Components {
         } // ErrorHandler()
 
     protected:
-        T *const emuInstance ;
+        T &emuInstance ;
     };
 
     template<typename T>
@@ -42,5 +42,11 @@ namespace Components {
         virtual void Tick() = 0 ;
     };
 }
+
+#define EMU_CPU emuInstance.cpu
+#define EMU_MEM emuInstance.memory
+#define EMU_CLK emuInstance.cycles
+#define CLK_CONT emuInstance.cycleCounter
+#define PRINT_ASM(x) emuInstance.disassembler.Disassemble(x)
 
 #endif //CPU_COMPONENT_TYPE_H

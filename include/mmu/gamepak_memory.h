@@ -2,7 +2,7 @@
 // Created by orzgg on 2020-06-28.
 //
 
-#include <array>
+#include <memory>
 
 #include <system_enum.h>
 #include <system_literals.h>
@@ -14,9 +14,10 @@
 namespace MMU {
     template<>
     struct Region<Region_t::GamePak> : RegionBase {
-        std::array<uint8_t, 0x2000000> state1{};
-        std::array<uint8_t, 0x2000000> state2{};
-        std::array<uint8_t, 0x2000000> state3{};
+        std::unique_ptr<uint8_t[]> state1 ;
+        std::unique_ptr<uint8_t[]> state2{};
+        std::unique_ptr<uint8_t[]> state3{};
+
         std::array<uint8_t, 0x10000> SRAM{};
 
         Region() : RegionBase(MMUString::MemRegionName[ Region_t::GamePak ]) {}

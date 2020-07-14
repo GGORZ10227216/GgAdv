@@ -7,7 +7,7 @@
 
 #include <component_type.h>
 #include <system_enum.h>
-#include <gg_utility/array_tool.h>
+#include <array_tool.h>
 
 #include <general_memory.h>
 #include <display_memory.h>
@@ -27,46 +27,18 @@ namespace Components {
     struct Memory final : public ClkDrivenComponent_t<Components::System>, public MMU::RegionBase {
         Memory(Components::System* parentPtr) ;
 
-        std::string ToString() override {
-            // TODO: list all handler infomation
-            return "";
-        }
+        std::string ToString() override ;
 
-        void Tick() override {
+        void Tick() override ;
 
-        }
-
-        void Reset() override {
-            generalMemory.Reset() ;
-            displayMemory.Reset() ;
-            gamepakMemory.Reset() ;
-        } // Reset()
+        void Reset() override ;
 
         // TODO: Implement a safe_read() and safe_write() to emulate not aligned memory access behavior on ARM CPU.
-        uint8_t Read8(unsigned addr) {
-            using WIDTH = MMU_Enum::WIDTH ;
-            uint8_t &result = Access(addr, WIDTH::BYTE);
-            CheckEvents(_readEventHandler, addr);
-            return result;
-        } // Read8()
+        uint8_t Read8(unsigned addr) ;
 
-        uint16_t Read16(unsigned addr) {
-            using WIDTH = MMU_Enum::WIDTH ;
-            if (addr % 2 != 0)
-                throw std::logic_error("Attempt to read a 16bit data from a not 2 aligned address");
-            CheckEvents(_readEventHandler, addr);
-            uint16_t &result = reinterpret_cast<uint16_t &> (Access(addr, WIDTH::HALFWORD));
-            return result;
-        } // Read16()
+        uint16_t Read16(unsigned addr) ;
 
-        uint32_t Read32(unsigned addr) {
-            using WIDTH = MMU_Enum::WIDTH ;
-            if (addr % 4 != 0)
-                throw std::logic_error("Attempt to read a 16bit data from a not 4 aligned address");
-            CheckEvents(_readEventHandler, addr);
-            uint32_t &result = reinterpret_cast<uint32_t &> (Access(addr, WIDTH::WORD));
-            return result;
-        } // Read32()
+        uint32_t Read32(unsigned addr) ;
 
         template<typename T>
         void Write8(unsigned addr, T value) requires std::is_same_v<T, uint8_t> {
@@ -116,20 +88,7 @@ namespace Components {
             } // if
         } // CheckEvents()
 
-        uint8_t &Access(unsigned addr, MMU_Enum::WIDTH width) override {
-            if (addr >= 0x0 && addr <= 0x4ffffff) {
-                return generalMemory.Access(addr, width);
-            } // if
-            else if (addr >= 0x5000000 && addr <= 0x7FFFFFF) {
-                return displayMemory.Access(addr, width);
-            } // else if
-            else if (addr >= 0x8000000 && addr <= 0xFFFFFFF) {
-                return gamepakMemory.Access(addr, width);
-            } // else if
-
-            OutOfBound(addr);
-            return generalMemory.Access(addr, width);
-        } // Access()
+        uint8_t &Access(unsigned addr, MMU_Enum::WIDTH width) override ;
 
         MMU::Region<Region_t::General> generalMemory;
         MMU::Region<Region_t::Display> displayMemory;

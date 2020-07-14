@@ -2,7 +2,7 @@
 // Created by orzgg on 2020-07-10.
 //
 
-#include <cpu/instruction_implement/arm/arm_header.h>
+#include <arm_header.h>
 #include <array_tool.h>
 #include <array>
 
@@ -11,7 +11,7 @@
 
 using namespace ArmHandler;
 
-constexpr static std::array<void (*)(Components::System*), 4096> ArmHandlerTable = {
+constexpr static std::array<void (*)(Components::System&), 4096> ArmHandlerTable = {
         AND, AND, AND, AND, AND, AND, AND, AND, AND, MUL, AND, STRH, AND, UDF, AND,
         UDF, ANDS, ANDS, ANDS, ANDS, ANDS, ANDS, ANDS, ANDS, ANDS, MULS, ANDS, LDRH, ANDS, LDRSB,
         ANDS, LDRSH, EOR, EOR, EOR, EOR, EOR, EOR, EOR, EOR, EOR, MLA, EOR, UDF, EOR,

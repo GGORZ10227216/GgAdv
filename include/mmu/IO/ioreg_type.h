@@ -15,28 +15,28 @@ namespace IO_Map {
     template <typename T, AccessMode M>
     struct IOReg_t {
         const unsigned addr ;
-        using parentMemory = Components::Memory* ;
-        T Read(parentMemory memory) const {
+        using parentMemory = Components::Memory ;
+        T Read(parentMemory &memory) const {
             if constexpr ( M == AccessMode::W )
                 throw std::logic_error( "Attempted write to read only I/O register." ) ;
             else {
                 if constexpr ( std::is_same_v<T, uint16_t> )
-                    return memory->Read16( addr ) ;
+                    return memory.Read16( addr ) ;
                 else if constexpr ( std::is_same_v<T, uint32_t> )
-                    return memory->Read32( addr ) ;
+                    return memory.Read32( addr ) ;
             } // else
             return 0 ;
         } // Read()
 
         template<typename U>
-        void Write( parentMemory memory, U value ) const requires std::is_same_v<T, U> {
+        void Write( parentMemory &memory, U value ) const requires std::is_same_v<T, U> {
             if constexpr ( M == AccessMode::R )
                 throw std::logic_error( "Attempted read from write only I/O register." ) ;
             else {
                 if constexpr ( std::is_same_v<T, uint16_t> )
-                    memory->Write16( addr, value ) ;
+                    memory.Write16( addr, value ) ;
                 else if constexpr ( std::is_same_v<T, uint32_t> )
-                    memory->Write32( addr, value ) ;
+                    memory.Write32( addr, value ) ;
             } // else
         } // Write()
     };

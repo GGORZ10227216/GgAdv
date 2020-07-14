@@ -49,10 +49,7 @@ namespace Components {
 
         unsigned ProgramCounter();
 
-        unsigned R15() {
-            unsigned offset = (CurrentDecodeMode() == DecodeMode::ARM) ? 4 : 2;
-            return _regs._registers_usersys[ RegName::pc ] - offset*2 ;
-        }
+        unsigned R15() ;
 
         unsigned Instruction() { return fetchedBuffer[stageCounter]; }
 

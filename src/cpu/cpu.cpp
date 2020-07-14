@@ -29,16 +29,16 @@ void Components::CPU::FillPipeline() {
     unsigned pcOffset = CurrentDecodeMode() == DecodeMode::ARM ? 4 : 2;
     unsigned pcBase = 0 ;
 
-    const unsigned Sclk = emuInstance->cycleCounter->S(ProgramCounter()) ;
-    const unsigned Nclk = emuInstance->cycleCounter->N(ProgramCounter()) ;
+    const unsigned Sclk = CLK_CONT.S(ProgramCounter()) ;
+    const unsigned Nclk = CLK_CONT.N(ProgramCounter()) ;
 
-    emuInstance->cycles += Sclk + Nclk ;
+    EMU_CLK += Sclk + Nclk ;
     for (int i = 0 ; i < fetchedBuffer.size(); ++i) {
         pcBase = _regs._registers_usersys[pc] + pcOffset*i ;
         if (pcOffset == 4)
-            fetchedBuffer[i] = emuInstance->memory->Read32(pcBase);
+            fetchedBuffer[i] = EMU_MEM.Read32(pcBase);
         else
-            fetchedBuffer[i] = emuInstance->memory->Read16(pcBase);
+            fetchedBuffer[i] = EMU_MEM.Read16(pcBase);
     } // for
 
     _regs._registers_usersys[ pc ] = pcBase ;
@@ -50,14 +50,14 @@ void Components::CPU::Fetch() {
     unsigned pcOffset = CurrentDecodeMode() == DecodeMode::ARM ? 4 : 2;
     _regs._registers_usersys[pc] += pcOffset;
     if (pcOffset == 4)
-        fetchedBuffer[ stageCounter ] = emuInstance->memory->Read32(ProgramCounter());
+        fetchedBuffer[ stageCounter ] = EMU_MEM.Read32(ProgramCounter());
     else
-        fetchedBuffer[ stageCounter ] = emuInstance->memory->Read16(ProgramCounter());
+        fetchedBuffer[ stageCounter ] = EMU_MEM.Read16(ProgramCounter());
     stageCounter = (stageCounter + 1) % fetchedBuffer.size();
 }
 
 void Components::CPU::Tick() {
-    if (emuInstance->cycles == 0) {
+    if (EMU_CLK == 0) {
         // CPU is ready to process next instruction
         if ( !pipelineFlushed )
             Fetch();
@@ -132,6 +132,11 @@ bool Components::CPU::ConditionCheck(const unsigned condCode) {
 
 unsigned Components::CPU::ProgramCounter() {
     return _regs._registers_usersys[RegName::pc];
+}
+
+unsigned Components::CPU::R15() {
+    unsigned offset = (CurrentDecodeMode() == DecodeMode::ARM) ? 4 : 2;
+    return _regs._registers_usersys[ RegName::pc ] - offset*2 ;
 }
 
 
