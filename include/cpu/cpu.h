@@ -39,7 +39,15 @@ namespace Components {
 
         DecodeMode CurrentDecodeMode();
 
+        unsigned ReadSpsr(CpuMode target) {
+            return GetSpsr(target) ;
+        }
+
         void WriteCpsr(unsigned newCpsr);
+
+        void WriteSpsr(CpuMode target, unsigned value) {
+            GetSpsr(target) = value ;
+        }
 
         void WriteReg(CPU_Enum::E_RegName reg, unsigned val);
 
@@ -75,8 +83,30 @@ namespace Components {
 
         bool ConditionCheck(const unsigned condCode);
 
+        unsigned& GetSpsr(CpuMode target) {
+            switch (target) {
+                case CpuMode::FIQ :
+                    _regs._spsr_fiq ;
+                    break ;
+                case CpuMode::IRQ :
+                    _regs._spsr_irq ;
+                    break ;
+                case CpuMode::SVC :
+                    _regs._spsr_svc ;
+                    break ;
+                case CpuMode::ABT :
+                    _regs._spsr_abt ;
+                    break ;
+                case CpuMode::UND :
+                    _regs._spsr_und ;
+                    break ;
+                default :
+                    throw std::logic_error("write spsr to a non-banked mode") ;
+            } // switch
+        }
+
         Registers _regs;
-        unsigned stageCounter = 0;
+        unsigned stageCounter = 0 ;
         bool pipelineFlushed = true ;
         std::array<unsigned, 3> fetchedBuffer;
     };

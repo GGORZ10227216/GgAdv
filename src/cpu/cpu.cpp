@@ -22,7 +22,7 @@ Components::CPU::CPU(Components::System* parentPtr) :
     WriteCpsr(0xd3);
     WriteReg(r0, 0x00000ca5);
     WriteReg(sp, 0x03007f00);
-    WriteReg(pc, 0x0);
+    // WriteReg(pc, 0x0);
 }
 
 void Components::CPU::FillPipeline() {
@@ -59,12 +59,11 @@ void Components::CPU::Fetch() {
 void Components::CPU::Tick() {
     if (EMU_CLK == 0) {
         // CPU is ready to process next instruction
+        Execute();
         if ( !pipelineFlushed )
             Fetch();
         else
             pipelineFlushed = false ;
-
-        Execute();
     } // if
     else
         CheckInterrupt();

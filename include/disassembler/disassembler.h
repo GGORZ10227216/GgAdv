@@ -3,8 +3,7 @@
 //
 
 #include <component_type.h>
-#include <arm_formatter.h>
-#include <thumb_formatter.h>
+#include <capstone/capstone.h>
 
 #ifndef TABLE_GEN_DECODER_H
 #define TABLE_GEN_DECODER_H
@@ -18,6 +17,11 @@ namespace Components {
         std::string ToString() override {
             return "Huh?" ;
         }
+
+    private :
+        csh armHandle, thumbHandle;
+        cs_insn *insn;
+        size_t count;
     };
 }
 

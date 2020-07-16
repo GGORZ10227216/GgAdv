@@ -49,7 +49,12 @@ set(decoder_sources
         src/disassembler/disassembler.cpp)
 
 add_executable(cpu main.cpp ${core_sources} ${core_headers} ${decoder_sources})
-target_link_libraries(cpu /usr/local/lib/libfmt.a /usr/local/lib/libbenchmark.a /usr/local/lib/libbenchmark_main.a)
+target_link_libraries(cpu
+        /usr/local/lib/libfmt.a
+        /usr/local/lib/libcapstone.a
+        /usr/local/lib/libbenchmark.a
+        /usr/local/lib/libbenchmark_main.a
+        )
 target_include_directories(cpu PUBLIC ${core_headers})
 
 project(test)

@@ -18,59 +18,60 @@ namespace ArmHandler {
     using AccessLambda = std::function<unsigned(unsigned)> ;
 
     template<typename T>
-    unsigned Operand2_reg(Components::System &emuInstance, AccessLambda Get, bool& carry) {
-        unsigned shAmount = Get(T::RsMark) ? EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rs))) : Get(T::shAmount);
-        unsigned RmValue = EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rm)));
+    unsigned Operand2(Components::System &emuInstance, bool& carry) {
+        using Type = disassemble::instruction_info<DecodeMode::ARM, 0>;
+        auto Get = [&](unsigned idx) {
+            return Type::access[idx](EMU_CPU.Instruction()) ;
+        } ;
 
-        if ( Get(T::RsMark) )
-            EMU_CLK += CLK_CONT.I() ;
+        if (!Get(T::I)) {
+            unsigned shAmount = Get(T::RsMark) ? EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rs))) : Get(T::shAmount);
+            unsigned RmValue = EMU_CPU.ReadReg(static_cast<RegName>(Get(T::Rm)));
 
-        switch (Get(T::shType)) {
-            case ShiftType::LSL :
-                if (shAmount == 0) {
-                    return RmValue;
-                } // if
-                else if (shAmount > 32) {
-                    carry = false ;
-                    return 0;
-                } // if
+            if ( Get(T::RsMark) )
+                EMU_CLK += CLK_CONT.I() ;
 
-                carry = Utility::TestBit(RmValue, 32 - shAmount) ;
-                return RmValue << shAmount;
-            case ShiftType::LSR :
-                if (shAmount == 0) {
-                    shAmount = 32;
-                } // if
-                else if (shAmount > 32) {
-                    carry = false ;
-                    return 0;
-                } // if
+            switch (Get(T::shType)) {
+                case ShiftType::LSL :
+                    if (shAmount == 0) {
+                        return RmValue;
+                    } // if
+                    else if (shAmount > 32) {
+                        carry = false ;
+                        return 0;
+                    } // if
 
-                carry = Utility::TestBit(RmValue, shAmount - 1) ;
-                return RmValue >> shAmount;
-            case ShiftType::ASR :
-                if (shAmount == 0 || shAmount > 32)
-                    shAmount = 32;
-                carry = Utility::TestBit(RmValue, shAmount - 1) ;
-                return static_cast<int32_t> (RmValue) >> shAmount;
-            case ShiftType::ROR :
-                if (shAmount == 0) {
-                    unsigned rrxVal = EMU_CPU.TestPSRFlag(PSRBit::C) ? Utility::_BV(31) : 0;
-                    return Utility::rotr(RmValue, 1) | rrxVal;
-                } // if
-                else if (shAmount > 32)
-                    shAmount -= 32;
-                carry = Utility::TestBit(RmValue, shAmount - 1) ;
-                return Utility::rotr(RmValue, shAmount);
-            default :
-                throw std::logic_error("unknown shift type");
-        } // switch
-    }
+                    carry = Utility::TestBit(RmValue, 32 - shAmount) ;
+                    return RmValue << shAmount;
+                case ShiftType::LSR :
+                    if (shAmount == 0) {
+                        shAmount = 32;
+                    } // if
+                    else if (shAmount > 32) {
+                        carry = false ;
+                        return 0;
+                    } // if
 
-    template<typename T>
-    unsigned Operand2(Components::System &emuInstance, AccessLambda Get, bool& carry) {
-        if (!Get(T::I))
-            return Operand2_reg<T>(emuInstance, Get, carry);
+                    carry = Utility::TestBit(RmValue, shAmount - 1) ;
+                    return RmValue >> shAmount;
+                case ShiftType::ASR :
+                    if (shAmount == 0 || shAmount > 32)
+                        shAmount = 32;
+                    carry = Utility::TestBit(RmValue, shAmount - 1) ;
+                    return static_cast<int32_t> (RmValue) >> shAmount;
+                case ShiftType::ROR :
+                    if (shAmount == 0) {
+                        unsigned rrxVal = EMU_CPU.TestPSRFlag(PSRBit::C) ? Utility::_BV(31) : 0;
+                        return Utility::rotr(RmValue, 1) | rrxVal;
+                    } // if
+                    else if (shAmount > 32)
+                        shAmount -= 32;
+                    carry = Utility::TestBit(RmValue, shAmount - 1) ;
+                    return Utility::rotr(RmValue, shAmount);
+                default :
+                    throw std::logic_error("unknown shift type");
+            } // switch
+        } // if
         else {
             return Utility::rotr(Get(T::imm), Get(T::rotate) * 2);
         } // else
@@ -93,14 +94,20 @@ namespace ArmHandler {
         const bool resultSigned = Utility::TestBit( result, 31 ) ;
 
         (RnSigned == op2Signed) && (RnSigned != resultSigned) ? cpu.SetFlag(V) : cpu.ClearFlag(V) ;
-        result > 0xffffffff ? cpu.SetFlag(C) : cpu.ClearFlag(C) ;
-        result == 0 ? cpu.SetFlag(Z) : cpu.ClearFlag(Z);
+        result > 0xffffffff ? cpu.SetFlag(C) : cpu.ClearFlag(C) ; // ARM's Carry flag is inverted?
+        (result & 0xffffffff) == 0 ? cpu.SetFlag(Z) : cpu.ClearFlag(Z);
         Utility::TestBit(result, 31) ? cpu.SetFlag(N) : cpu.ClearFlag(N) ;
     }
 
     enum class ALUType { ARITHMETIC, LOGICAL } ;
     enum class CPSRaffect { S, NON_S } ;
     enum class HasResult { NORMAL, TEST } ;
+    enum {
+        Type_ALU, Type_MUL, Type_MULL, Type_SWP,
+        Type_BX, Type_HDT, Type_DT, Type_UDF,
+        Type_MDT, Type_B, Type_CDT, Type_CDP,
+        Type_CRT, Type_SWI
+    };
 
     template<ALUType T, CPSRaffect S, HasResult R>
     struct ALUProcessor {
@@ -116,8 +123,9 @@ namespace ArmHandler {
             } ;
 
             dstName = static_cast<RegName>( Get(Type::Rd) );
-            Rn = Get(Type::Rn) ;
-            op2 = Operand2<Type>(emuInstance, Get, shiftCarry) ;
+            RnName = static_cast<RegName>( Get(Type::Rn) ) ;
+            Rn = EMU_CPU.ReadReg(RnName) ;
+            op2 = Operand2<Type>(emuInstance, shiftCarry) ;
             result = operation(Rn, op2) ;
 
             if constexpr (S == CPSRaffect::S) {
@@ -127,17 +135,19 @@ namespace ArmHandler {
                     CPSR_Logical(EMU_CPU, result, shiftCarry) ;
             } // if constexpr
 
-            if constexpr (R == HasResult::NORMAL) {
+            if constexpr (R == HasResult::NORMAL)
                 EMU_CPU.WriteReg(dstName, result) ;
-                if (Get(Type::Rd) == RegName::pc)
-                    EMU_CPU.FillPipeline() ;
-            } // if constexpr
         }
 
         bool shiftCarry ;
-        RegName dstName ;
+        RegName dstName, RnName ;
         unsigned Rn, op2 ;
         uint64_t result ;
+    };
+
+    template<typename T, CPSRaffect S>
+    struct Multiplier {
+
     };
 }
 

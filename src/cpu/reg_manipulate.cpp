@@ -52,6 +52,8 @@ void Components::CPU::WriteCpsr(unsigned newCpsr) {
 
 void Components::CPU::WriteReg(RegName reg, unsigned int val) {
     GetRegRef(reg) = val;
+    if (reg == RegName::pc)
+        FillPipeline() ;
 }
 
 CpuMode Components::CPU::CurrentCPUMode() {

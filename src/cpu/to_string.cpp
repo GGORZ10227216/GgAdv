@@ -17,7 +17,7 @@ using namespace CPUString ;
 std::string Components::CPU::ToString() {
     std::string Status = PrintStatus();
     std::string registerStatus = _regs.ToString() ;
-    return fmt::format("clk:{} [{:#04x}] {}(0x{:08x})\n{}\n{}\n",
+    return fmt::format("clk:{} [{:#04x}] \"{}\"(0x{:08x})\n{}\n{}\n",
             EMU_CLK,
             R15(),
             PRINT_ASM(Instruction()),

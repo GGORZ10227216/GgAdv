@@ -32,10 +32,10 @@ void Components::System::EmulationLoop() {
     cycles = 0 ;
     while (true) {
         /// TODO: using "true" before GUI is finished.
-        cpu.Tick() ;
         fmt::print( "{}", cpu.ToString() ) ;
         /// TODO: manually set clk to 0 for cpu debugging
         cycles = 0 ;
+        cpu.Tick() ;
         getchar() ;
     } // while
 }
