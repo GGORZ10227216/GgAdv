@@ -2,9 +2,6 @@
 // Created by orzgg on 2020-07-10.
 //
 
-#include <arm_header.h>
-#include <arm_implement_tools.h>
-
 //void ArmHandler::MOV(Components::System& system) {
 //    ALUProcessor<ALUType::LOGICAL, CPSRaffect::NON_S, HasResult::NORMAL>(
 //            system,

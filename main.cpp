@@ -5,18 +5,8 @@
 #include <benchmark/benchmark.h>
 #include <system_components.h>
 
-void BenchmarkEmulator(benchmark::State& state) {
+int main() {
     Components::System emulator;
-    for (auto _ : state) {
-        emulator.BenchmarkStart(std::nullopt) ;
-    } // for
+    emulator.Start(std::nullopt);
+    return 0;
 }
-
-BENCHMARK(BenchmarkEmulator) ;
-BENCHMARK_MAIN() ;
-
-//int main() {
-//    Components::System emulator;
-//    emulator.Start(std::nullopt);
-//    return 0;
-//}

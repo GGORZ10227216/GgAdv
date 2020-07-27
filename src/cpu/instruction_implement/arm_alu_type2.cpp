@@ -1,9 +1,6 @@
 //
 // Created by orzgg on 2020-07-11.
 //
-#include <arm_header.h>
-#include <arm_implement_tools.h>
-#include <macro.h>
 
 //void ArmHandler::CMP(Components::System& system) {
 //    ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::TEST> (

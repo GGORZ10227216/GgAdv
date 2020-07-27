@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(cpu)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_FLAGS "-fconcepts")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -fsanitize=address,leak,undefined")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -pthread -Ofast -flto")
 

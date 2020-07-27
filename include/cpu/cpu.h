@@ -27,7 +27,9 @@ namespace Components {
 
         void ChangeCPUMode(CpuMode newMode);
 
-        unsigned ReadReg(RegName regNum);
+        unsigned ReadReg(RegName reg) {
+            return _regs.contents[reg];
+        } // ReadReg()
 
         unsigned ReadCpsr();
 
@@ -79,7 +81,7 @@ namespace Components {
 
         void CheckVisible(bool inThumb, size_t regNum);
 
-        unsigned &GetRegRef(RegName reg);
+//        unsigned &GetRegRef(RegName reg);
 
         bool ConditionCheck(const unsigned condCode);
 

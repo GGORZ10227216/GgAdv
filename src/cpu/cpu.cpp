@@ -19,10 +19,8 @@ using namespace CPU_Enum;
 Components::CPU::CPU(Components::System* parentPtr) :
     ClkDrivenComponent_t(parentPtr)
 {
-    WriteCpsr(0xd3);
     WriteReg(r0, 0x00000ca5);
     WriteReg(sp, 0x03007f00);
-    // WriteReg(pc, 0x0);
 }
 
 void Components::CPU::FillPipeline() {
@@ -34,21 +32,20 @@ void Components::CPU::FillPipeline() {
 
     EMU_CLK += Sclk + Nclk ;
     for (int i = 0 ; i < fetchedBuffer.size(); ++i) {
-        pcBase = _regs._registers_usersys[pc] + pcOffset*i ;
+        pcBase = _regs.contents[pc] + pcOffset * i ;
         if (pcOffset == 4)
             fetchedBuffer[i] = EMU_MEM.Read32(pcBase);
         else
             fetchedBuffer[i] = EMU_MEM.Read16(pcBase);
     } // for
 
-    _regs._registers_usersys[ pc ] = pcBase ;
+    _regs.contents[ pc ] = pcBase ;
     stageCounter = 0 ;
-    pipelineFlushed = true ;
 }
 
 void Components::CPU::Fetch() {
     unsigned pcOffset = CurrentDecodeMode() == DecodeMode::ARM ? 4 : 2;
-    _regs._registers_usersys[pc] += pcOffset;
+    _regs.contents[pc] += pcOffset;
     if (pcOffset == 4)
         fetchedBuffer[ stageCounter ] = EMU_MEM.Read32(ProgramCounter());
     else
@@ -60,10 +57,7 @@ void Components::CPU::Tick() {
     if (EMU_CLK == 0) {
         // CPU is ready to process next instruction
         Execute();
-        if ( !pipelineFlushed )
-            Fetch();
-        else
-            pipelineFlushed = false ;
+        Fetch();
     } // if
     else
         CheckInterrupt();
@@ -130,12 +124,12 @@ bool Components::CPU::ConditionCheck(const unsigned condCode) {
 }
 
 unsigned Components::CPU::ProgramCounter() {
-    return _regs._registers_usersys[RegName::pc];
+    return _regs.contents[RegName::pc];
 }
 
 unsigned Components::CPU::R15() {
     unsigned offset = (CurrentDecodeMode() == DecodeMode::ARM) ? 4 : 2;
-    return _regs._registers_usersys[ RegName::pc ] - offset*2 ;
+    return _regs.contents[ RegName::pc ] - offset * 2 ;
 }
 
 

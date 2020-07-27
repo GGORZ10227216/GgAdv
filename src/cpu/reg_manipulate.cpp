@@ -13,10 +13,6 @@ void Components::CPU::ChangeCPUMode(CpuMode newMode) {
     _regs._cpsr |= newMode;
 } // ChangeCPUMode()
 
-unsigned Components::CPU::ReadReg(RegName reg) {
-    return GetRegRef(reg);
-} // ReadReg()
-
 void Components::CPU::CheckVisible(bool inThumb, size_t regNum) {
     if (inThumb && regNum > r7 && regNum < sp)
         throw std::logic_error("Trying to access Hi register directly in Thumb mode.");
@@ -47,11 +43,34 @@ void Components::CPU::RestoreCpsr(CpuMode mode) {
 }
 
 void Components::CPU::WriteCpsr(unsigned newCpsr) {
+    using namespace CPU_Enum ;
+    CpuMode oldMode = static_cast<CpuMode> (_regs._cpsr & cpuModeMask) ;
+    CpuMode newMode = static_cast<CpuMode> (newCpsr & cpuModeMask) ;
+    unsigned* currentCpsr = _regs.GetBankRegDataPtr(oldMode),
+            * targetCpsr  = _regs.GetBankRegDataPtr(newMode);
+
+    if (oldMode != newMode) {
+        const int cpStart_old = (oldMode == FIQ) ? r8 : sp ;
+        const int cpStart_new = (newMode == FIQ) ? r8 : sp ;
+        const unsigned cpSize_old = lr - cpStart_old + 1 ;
+        const unsigned cpSize_new = lr - cpStart_new + 1 ;
+        // Store back current content to reg bank
+        memcpy(currentCpsr, _regs.contents.data() + cpStart_old, sizeof(unsigned) * cpSize_old ) ;
+        if (cpStart_old - cpStart_new < 0 && newMode == CpuMode::FIQ) {
+            // switch from a bank which is smaller than current mode's bank
+            // r8~r12 need to restored from usersys bank
+            memcpy(_regs.contents.data() + r8, _regs._registers_usrsys.data() + r8, sizeof(unsigned) * 5 ) ;
+        } // if
+
+        // Load banked register from new mode's reg bank
+        memcpy( _regs.contents.data() + cpStart_new, targetCpsr, sizeof(unsigned) * cpSize_new ) ;
+    } // if
+
     _regs._cpsr = newCpsr;
 }
 
 void Components::CPU::WriteReg(RegName reg, unsigned int val) {
-    GetRegRef(reg) = val;
+    _regs.contents[reg] = val;
     if (reg == RegName::pc)
         FillPipeline() ;
 }
@@ -69,29 +88,6 @@ CpuMode Components::CPU::CurrentCPUMode() {
         default :
             throw std::logic_error("Unknown CPU Mode!");
     } // switch
-}
-
-unsigned &Components::CPU::GetRegRef(RegName reg) {
-    CheckVisible(TestPSRFlag(T), reg);
-    switch (_regs._cpsr & cpuModeMask) {
-        case FIQ :
-            if (reg >= r8 && reg <= lr)
-                return _regs._registers_fiq[reg - r8];
-        case IRQ :
-            if (reg >= sp && reg <= lr)
-                return _regs._registers_irq[reg - sp];
-        case SVC :
-            if (reg >= sp && reg <= lr)
-                return _regs._registers_svc[reg - sp];
-        case ABT :
-            if (reg >= sp && reg <= lr)
-                return _regs._registers_abt[reg - sp];
-        case UND :
-            if (reg >= sp && reg <= lr)
-                return _regs._registers_und[reg - sp];
-    } // switch
-
-    return _regs._registers_usersys[reg];
 }
 
 bool Components::CPU::TestPSRFlag(CPU_Enum::E_PSRBit bitName) {

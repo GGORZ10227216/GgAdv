@@ -10,7 +10,8 @@ namespace Utility {
         return 0x1 << bitNo ;
     } // _BV()
 
-    constexpr bool TestBit( unsigned bin, size_t bitNo ) {
+    template<typename T>
+    constexpr bool TestBit( T bin, size_t bitNo ) {
         return bin & _BV( bitNo ) ;
     } // TestBit()
 

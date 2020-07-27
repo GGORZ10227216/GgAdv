@@ -4,200 +4,123 @@
 
 #include <system_components.h>
 #include <arm_implement_tools.h>
-#include <macro.h>
 
 #ifndef TEST_ARM_HEADER_H
 #define TEST_ARM_HEADER_H
 
 namespace ArmHandler {
     static void AND(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) & op2; }
         );
     }
 
     static void MUL(Components::System &emuInstance) {
-        ACCESS(Type_MUL) ;
-        RegName RsName = static_cast<RegName>(Get(Type::Rs));
-        RegName RdName = static_cast<RegName>(Get(Type::Rd));
-        RegName RmName = static_cast<RegName>(Get(Type::Rm));
-        unsigned RsValue = EMU_CPU.ReadReg(RsName) ;
-        unsigned RmValue = EMU_CPU.ReadReg(RmName) ;
-
-        unsigned boothValue = 4 ;
-        for (int i = 1 ; i < 4 ; ++i) {
-            unsigned boothCheck = RsValue >> (8*i) ;
-            const unsigned allOneMask = 0xffffffff ;
-            if (boothCheck == 0 || boothCheck == allOneMask >> (8*i) ) {
-                boothValue = i ;
-                break ;
-            } // if
-        } // for
-
-        unsigned result = RmValue*RsName ;
-        EMU_CLK += CLK_CONT.S(EMU_CPU.ProgramCounter()) + CLK_CONT.I()*(boothValue + 1) ;
-        EMU_CPU.WriteReg(RdName, RmValue*RsName) ;
+        Multiply<Accumulate::NO, AffectCPSR::NO>(emuInstance) ;
     }
 
-    static void STRH(Components::System &emuInstance) {}
+    static void STRH(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::HALFWORD, SIGNED::NO, AccessMode::STORE> (emuInstance) ;
+    }
 
     static void ANDS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) & op2; }
         );
     }
 
     static void MULS(Components::System &emuInstance) {
-        ACCESS(Type_MUL) ;
-        RegName RsName = static_cast<RegName>(Get(Type::Rs));
-        RegName RdName = static_cast<RegName>(Get(Type::Rd));
-        RegName RmName = static_cast<RegName>(Get(Type::Rm));
-        unsigned RsValue = EMU_CPU.ReadReg(RsName) ;
-        unsigned RmValue = EMU_CPU.ReadReg(RmName) ;
-
-        unsigned boothValue = 4 ;
-        for (int i = 1 ; i < 4 ; ++i) {
-            unsigned boothCheck = RsValue >> (8*i) ;
-            const unsigned allOneMask = 0xffffffff ;
-            if (boothCheck == 0 || boothCheck == allOneMask >> (8*i) ) {
-                boothValue = i ;
-                break ;
-            } // if
-        } // for
-
-        unsigned result = RmValue*RsName ;
-        EMU_CLK += CLK_CONT.S(EMU_CPU.ProgramCounter()) + CLK_CONT.I()*(boothValue + 1) ;
-        EMU_CPU.WriteReg(RdName, result) ;
-
-        // Result of C is meaningless, V is unaffected.
-        result == 0 ? EMU_CPU.SetFlag(PSRBit::Z) : EMU_CPU.ClearFlag(PSRBit::Z) ;
-        Utility::TestBit(result, 31) ? EMU_CPU.SetFlag(PSRBit::N) : EMU_CPU.ClearFlag(PSRBit::N) ;
+        Multiply<Accumulate::NO, AffectCPSR::NO>(emuInstance) ;
     }
 
-    static void LDRH(Components::System &emuInstance) {}
+    static void LDRH(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::HALFWORD, SIGNED::NO, AccessMode::LOAD> (emuInstance) ;
+    }
 
-    static void LDRSB(Components::System &emuInstance) {}
+    static void LDRSB(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::BYTE, SIGNED::YES, AccessMode::LOAD> (emuInstance) ;
+    }
 
-    static void LDRSH(Components::System &emuInstance) {}
+    static void LDRSH(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::HALFWORD, SIGNED::YES, AccessMode::LOAD> (emuInstance) ;
+    }
 
     static void EOR(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) ^ op2; }
         );
     }
 
     static void MLA(Components::System &emuInstance) {
-        ACCESS(Type_MUL) ;
-        RegName RsName = static_cast<RegName>(Get(Type::Rs));
-        RegName RdName = static_cast<RegName>(Get(Type::Rd));
-        RegName RnName = static_cast<RegName>(Get(Type::Rn));
-        RegName RmName = static_cast<RegName>(Get(Type::Rm));
-        unsigned RsValue = EMU_CPU.ReadReg(RsName) ;
-        unsigned RmValue = EMU_CPU.ReadReg(RmName) ;
-        unsigned RnValue = EMU_CPU.ReadReg(RnName) ;
-
-        unsigned boothValue = 4 ;
-        for (int i = 1 ; i < 4 ; ++i) {
-            unsigned boothCheck = RsValue >> (8*i) ;
-            const unsigned allOneMask = 0xffffffff ;
-            if (boothCheck == 0 || boothCheck == allOneMask >> (8*i) ) {
-                boothValue = i ;
-                break ;
-            } // if
-        } // for
-
-        unsigned result = RmValue*RsName + RnValue ;
-        EMU_CLK += CLK_CONT.S(EMU_CPU.ProgramCounter()) + CLK_CONT.I()*(boothValue + 1) ;
-        EMU_CPU.WriteReg(RdName, result) ;
+        Multiply<Accumulate::YES, AffectCPSR::NO>(emuInstance) ;
     }
 
     static void EORS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) ^ op2; }
         );
     }
 
     static void MLAS(Components::System &emuInstance) {
-        ACCESS(Type_MUL) ;
-        RegName RsName = static_cast<RegName>(Get(Type::Rs));
-        RegName RdName = static_cast<RegName>(Get(Type::Rd));
-        RegName RnName = static_cast<RegName>(Get(Type::Rn));
-        RegName RmName = static_cast<RegName>(Get(Type::Rm));
-        unsigned RsValue = EMU_CPU.ReadReg(RsName) ;
-        unsigned RmValue = EMU_CPU.ReadReg(RmName) ;
-        unsigned RnValue = EMU_CPU.ReadReg(RnName) ;
-
-        unsigned boothValue = 4 ;
-        for (int i = 1 ; i < 4 ; ++i) {
-            unsigned boothCheck = RsValue >> (8*i) ;
-            const unsigned allOneMask = 0xffffffff ;
-            if (boothCheck == 0 || boothCheck == allOneMask >> (8*i) ) {
-                boothValue = i ;
-                break ;
-            } // if
-        } // for
-
-        unsigned result = RmValue*RsName + RnValue ;
-        EMU_CLK += CLK_CONT.S(EMU_CPU.ProgramCounter()) + CLK_CONT.I()*(boothValue + 1) ;
-        EMU_CPU.WriteReg(RdName, result) ;
-
-        // Result of C is meaningless, V is unaffected.
-        result == 0 ? EMU_CPU.SetFlag(PSRBit::Z) : EMU_CPU.ClearFlag(PSRBit::Z) ;
-        Utility::TestBit(result, 31) ? EMU_CPU.SetFlag(PSRBit::N) : EMU_CPU.ClearFlag(PSRBit::N) ;
+        Multiply<Accumulate::YES, AffectCPSR::YES>(emuInstance) ;
     }
 
     static void SUB(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) + ~op2 + 1; }
         );
     }
 
     static void SUBS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) + ~op2 + 1; }
         );
     }
 
     static void RSB(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (op2) + ~Rn + 1; }
         );
     }
 
     static void RSBS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (op2) + ~Rn + 1; }
         );
     }
 
     static void ADD(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) + op2; }
         );
     }
 
-    static void UMULL(Components::System &emuInstance) {}
+    static void UMULL(Components::System &emuInstance) {
+        MultiplyLong<Signed::NO, Accumulate::NO, AffectCPSR::NO>(emuInstance) ;
+    }
 
     static void ADDS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t> (Rn) + op2; }
         );
     }
 
-    static void UMULLS(Components::System &emuInstance) {}
+    static void UMULLS(Components::System &emuInstance) {
+        MultiplyLong<Signed::NO, Accumulate::NO, AffectCPSR::YES>(emuInstance) ;
+    }
 
     static void ADC(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -206,10 +129,12 @@ namespace ArmHandler {
         );
     }
 
-    static void UMLAL(Components::System &emuInstance) {}
+    static void UMLAL(Components::System &emuInstance) {
+        MultiplyLong<Signed::NO, Accumulate::YES, AffectCPSR::NO>(emuInstance) ;
+    }
 
     static void ADCS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -218,10 +143,12 @@ namespace ArmHandler {
         );
     }
 
-    static void UMLALS(Components::System &emuInstance) {}
+    static void UMLALS(Components::System &emuInstance) {
+        MultiplyLong<Signed::NO, Accumulate::YES, AffectCPSR::YES>(emuInstance) ;
+    }
 
     static void SBC(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -230,10 +157,12 @@ namespace ArmHandler {
         );
     }
 
-    static void SMULL(Components::System &emuInstance) {}
+    static void SMULL(Components::System &emuInstance) {
+        MultiplyLong<Signed::YES, Accumulate::NO, AffectCPSR::NO>(emuInstance) ;
+    }
 
     static void SBCS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -242,10 +171,12 @@ namespace ArmHandler {
         );
     }
 
-    static void SMULLS(Components::System &emuInstance) {}
+    static void SMULLS(Components::System &emuInstance) {
+        MultiplyLong<Signed::YES, Accumulate::NO, AffectCPSR::YES>(emuInstance) ;
+    }
 
     static void RSC(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -254,10 +185,12 @@ namespace ArmHandler {
         );
     }
 
-    static void SMLAL(Components::System &emuInstance) {}
+    static void SMLAL(Components::System &emuInstance) {
+        MultiplyLong<Signed::YES, Accumulate::YES, AffectCPSR::NO>(emuInstance) ;
+    }
 
     static void RSCS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     unsigned carry = static_cast<unsigned> (EMU_CPU.TestPSRFlag(PSRBit::C));
@@ -266,7 +199,9 @@ namespace ArmHandler {
         );
     }
 
-    static void SMLALS(Components::System &emuInstance) {}
+    static void SMLALS(Components::System &emuInstance) {
+        MultiplyLong<Signed::YES, Accumulate::YES, AffectCPSR::YES>(emuInstance) ;
+    }
 
     static void MRS(Components::System &emuInstance) {
         ACCESS(Type_ALU) ;
@@ -285,10 +220,32 @@ namespace ArmHandler {
         } // else
     }
 
-    static void SWP(Components::System &emuInstance) {}
+    static void SWP(Components::System &emuInstance) {
+        ACCESS(Type_SWP) ;
+        RegName RnName = GetRegName(Type::Rn) ;
+        RegName RdName = GetRegName(Type::Rd) ;
+        RegName RmName = GetRegName(Type::Rm) ;
+
+        unsigned targetAddr = EMU_CPU.ReadReg(RnName) ;
+        EMU_CLK += CLK_CONT.S(EMU_CPU.ProgramCounter()) ;
+//        if (Get(Type::B)) {
+//            EMU_CPU.WriteReg(RdName, EMU_MEM.Read8(targetAddr)) ;
+//            EMU_CLK += CLK_CONT.ND(targetAddr, MMU_Enum::WIDTH::BYTE) ;
+//            EMU_MEM.Write8(static_cast<uint8_t>(EMU_CPU.ReadReg(RmName))) ;
+//            EMU_CLK += CLK_CONT.ND(targetAddr, MMU_Enum::WIDTH::BYTE) ;
+//        } // if
+//        else {
+//            EMU_CPU.WriteReg(RdName, EMU_MEM.Read32(targetAddr)) ;
+//            EMU_CLK += CLK_CONT.ND(targetAddr, MMU_Enum::WIDTH::WORD) ;
+//            EMU_MEM.Write32(EMU_CPU.ReadReg(RmName)) ;
+//            EMU_CLK += CLK_CONT.ND(targetAddr, MMU_Enum::WIDTH::WORD) ;
+//        } // else
+
+        EMU_CLK += CLK_CONT.I() ;
+    }
 
     static void TST(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::S, HasResult::TEST>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::YES, HasResult::TEST>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t>(Rn) & op2;
@@ -332,7 +289,7 @@ namespace ArmHandler {
     }
 
     static void TEQ(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::S, HasResult::TEST>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::YES, HasResult::TEST>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t>(Rn) ^ op2;
@@ -343,7 +300,7 @@ namespace ArmHandler {
     static void SWPB(Components::System &emuInstance) {}
 
     static void CMP(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::TEST>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::TEST>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t>(Rn) + ~op2 + 1;
@@ -352,7 +309,7 @@ namespace ArmHandler {
     }
 
     static void CMN(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::TEST>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::TEST>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t>(Rn) + op2;
@@ -361,7 +318,7 @@ namespace ArmHandler {
     }
 
     static void ORR(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t> (Rn) | op2;
@@ -370,7 +327,7 @@ namespace ArmHandler {
     }
 
     static void ORRS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t> (Rn) | op2;
@@ -379,21 +336,21 @@ namespace ArmHandler {
     }
 
     static void MOV(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t>(op2); }
         );
     } // MOV()
 
     static void MOVS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t>(op2); }
         );
     } // MOVS()
 
     static void BIC(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t> (Rn) & (~op2);
@@ -402,7 +359,7 @@ namespace ArmHandler {
     }
 
     static void BICS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::ARITHMETIC, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::ARITHMETIC, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [&](unsigned Rn, unsigned op2) {
                     return static_cast<uint64_t> (Rn) & (~op2);
@@ -411,35 +368,51 @@ namespace ArmHandler {
     }
 
     static void MVN(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::NON_S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::NO, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t>(~op2); }
         );
     } // MVN()
 
     static void MVNS(Components::System &emuInstance) {
-        ALUProcessor<ALUType::LOGICAL, CPSRaffect::S, HasResult::NORMAL>(
+        ALUProcessor<ALUType::LOGICAL, AffectCPSR::YES, HasResult::NORMAL>(
                 emuInstance,
                 [](unsigned Rn, unsigned op2) { return static_cast<uint64_t>(~op2); }
         );
     } // MVNS()
 
 
-    static void STR(Components::System &emuInstance) {}
+    static void STR(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::WORD, AccessMode::STORE> (emuInstance) ;
+    }
 
-    static void LDR(Components::System &emuInstance) {}
+    static void LDR(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::WORD, AccessMode::LOAD> (emuInstance) ;
+    }
 
-    static void STRT(Components::System &emuInstance) {}
+    static void STRT(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::WORD, AccessMode::STORE> (emuInstance) ;
+    }
 
-    static void LDRT(Components::System &emuInstance) {}
+    static void LDRT(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::WORD, AccessMode::LOAD> (emuInstance) ;
+    }
 
-    static void STRB(Components::System &emuInstance) {}
+    static void STRB(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::BYTE, AccessMode::STORE> (emuInstance) ;
+    }
 
-    static void LDRB(Components::System &emuInstance) {}
+    static void LDRB(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::BYTE, AccessMode::LOAD> (emuInstance) ;
+    }
 
-    static void STRBT(Components::System &emuInstance) {}
+    static void STRBT(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::BYTE, AccessMode::STORE> (emuInstance) ;
+    }
 
-    static void LDRBT(Components::System &emuInstance) {}
+    static void LDRBT(Components::System &emuInstance) {
+        MemoryAccess<AccessSize::BYTE, AccessMode::LOAD> (emuInstance) ;
+    }
 
     static void STMDA(Components::System &emuInstance) {}
 

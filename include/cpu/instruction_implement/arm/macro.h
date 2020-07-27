@@ -9,6 +9,9 @@
     using Type = disassemble::instruction_info<DecodeMode::ARM, typeCode> ;\
     auto Get = [&](unsigned idx) {\
         return Type::access[ idx ](emuInstance.cpu.Instruction()) ;\
-    }
+    };\
+    auto GetRegName = [&](unsigned idx){ \
+        return static_cast<RegName>(Type::access[ idx ](emuInstance.cpu.Instruction())) ;\
+    } \
 
 #endif //TEST_MACRO_H

@@ -17,7 +17,7 @@ void Components::System::Start(std::optional<const char*> romPath) {
         } // if
 
         EmulationLoop() ;
-    } catch (std::exception &e) {
+    } catch (std::exception e) {
         fmt::print( "Error: ", e.what() ) ;
     } // catch()
 }

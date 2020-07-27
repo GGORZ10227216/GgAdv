@@ -32,3 +32,8 @@ Components::Disassembler::Disassembler(Components::System* parentPtr) :
     if (cs_open(CS_ARCH_ARM, CS_MODE_THUMB, &thumbHandle) != CS_ERR_OK)
         exit(-1);
 }
+
+Components::Disassembler::~Disassembler() {
+    cs_close(&armHandle) ;
+    cs_close(&thumbHandle) ;
+}
